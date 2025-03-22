@@ -343,16 +343,16 @@ std::istream & operator>>( std::istream & stream, GroceryItem & groceryItem )
 
   char delimiter = '\x{00}';                                          // C++23 delimited escape sequence for the character whose value is zero (the null character)
   ///////////////////////// TO-DO (21) //////////////////////////////
-  char delimiter1 = '\0', delimiter2 = '\0', delimiter3 = '\0';
+  delimiter += 0;
 
+  char delimiter1 = '\0', delimiter2 = '\0', delimiter3 = '\0';
   GroceryItem working;
+
   stream >> std::ws
          >> std::quoted(working._upcCode)     >> delimiter1
          >> std::ws >> std::quoted(working._brandName)   >> delimiter2
          >> std::ws >> std::quoted(working._productName) >> delimiter3
          >> std::ws >> working._price;
-
-  // Only commit the read if everything succeeded and each delimiter was a comma.
   if (!stream.fail() && delimiter1 == ',' && delimiter2 == ',' && delimiter3 == ',')
   {
     groceryItem = std::move(working);
