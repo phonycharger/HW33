@@ -86,13 +86,12 @@ GroceryItem::GroceryItem(GroceryItem && other) noexcept
 GroceryItem & GroceryItem::operator=( GroceryItem const & rhs ) &
 {
   ///////////////////////// TO-DO (5) //////////////////////////////
-if (this != &rhs) {
-    _upcCode = rhs._upcCode;
-    _brandName = rhs._brandName;
-    _productName = rhs._productName;
-    _price = rhs._price;
-}
-return *this;
+ if (this == &rhs) return *this;  // Self-assignment guard
+  _upcCode     = rhs._upcCode;
+  _brandName   = rhs._brandName;
+  _productName = rhs._productName;
+  _price       = rhs._price;
+  return *this;
   /////////////////////// END-TO-DO (5) ////////////////////////////
 }
 
@@ -344,17 +343,26 @@ std::istream & operator>>( std::istream & stream, GroceryItem & groceryItem )
 
   char delimiter = '\x{00}';                                          // C++23 delimited escape sequence for the character whose value is zero (the null character)
   ///////////////////////// TO-DO (21) //////////////////////////////
-(void)delimiter;  // Silence unused variable warning
+  char delimiter1 = '\0', delimiter2 = '\0', delimiter3 = '\0';
 
-GroceryItem working;
-char comma;
-stream >> std::quoted(working._upcCode) >> comma
-       >> std::quoted(working._brandName) >> comma
-       >> std::quoted(working._productName) >> comma
-       >> working._price;
+  GroceryItem working;
+  stream >> std::ws
+         >> std::quoted(working._upcCode)     >> delimiter1
+         >> std::ws >> std::quoted(working._brandName)   >> delimiter2
+         >> std::ws >> std::quoted(working._productName) >> delimiter3
+         >> std::ws >> working._price;
 
-if (stream) groceryItem = std::move(working);
-return stream;
+  // Only commit the read if everything succeeded and each delimiter was a comma.
+  if (!stream.fail() && delimiter1 == ',' && delimiter2 == ',' && delimiter3 == ',')
+  {
+    groceryItem = std::move(working);
+  }
+  else
+  {
+    stream.setstate(std::ios::failbit);  // force extraction to fail if delimiters are wrong
+  }
+
+  return stream;
   /////////////////////// END-TO-DO (21) ////////////////////////////
 }
 
