@@ -63,10 +63,10 @@ GroceryItemDatabase::GroceryItemDatabase( const std::string & filename )
   //
 
   ///////////////////////// TO-DO (2) //////////////////////////////
-  GroceryItem item;
+   GroceryItem item;
   while( fin >> item )
   {
-    _data.push_back( std::move(item) );
+    _data.push_back(std::move(item));
   }
   /////////////////////// END-TO-DO (2) ////////////////////////////
 
