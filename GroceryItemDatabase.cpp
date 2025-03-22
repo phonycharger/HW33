@@ -1,6 +1,11 @@
 ///////////////////////// TO-DO (1) //////////////////////////////
-#include "GroceryItemDatabase.hpp"
+#include <fstream>
+#include <stdexcept>
+#include <iostream>
+#include <iterator>
+#include <utility>
 #include <filesystem>
+#include "GroceryItemDatabase.hpp"
 /////////////////////// END-TO-DO (1) ////////////////////////////
 
 
@@ -59,8 +64,9 @@ GroceryItemDatabase::GroceryItemDatabase( const std::string & filename )
 
   ///////////////////////// TO-DO (2) //////////////////////////////
   GroceryItem item;
-  while (fin >> item) {
-    _data[item.upcCode()] = std::move(item);
+  while( fin >> item )
+  {
+    _data.push_back( std::move(item) );
   }
   /////////////////////// END-TO-DO (2) ////////////////////////////
 
@@ -78,28 +84,15 @@ GroceryItemDatabase::GroceryItemDatabase( const std::string & filename )
 
 
 ///////////////////////// TO-DO (3) //////////////////////////////
-namespace
+GroceryItem * GroceryItemDatabase::find( const std::string & upc )
 {
-  // A simple recursive helper to find a UPC in our map
-  GroceryItem * findRecursive(std::map<std::string, GroceryItem>::iterator current,
-                              std::map<std::string, GroceryItem>::iterator end,
-                              std::string const & upc)
-  {
-    if (current == end) return nullptr;              // base case: not found
-    if (current->first == upc) return &current->second;  // base case: found
-    return findRecursive(std::next(current), end, upc);  // recursive case
-  }
+  return find( upc, 0 );
 }
 
-GroceryItem * GroceryItemDatabase::find(const std::string & upc)
+GroceryItem * GroceryItemDatabase::find( const std::string & upc, std::size_t index )
 {
-  // Start recursion from _data.begin() to _data.end()
-  return findRecursive(_data.begin(), _data.end(), upc);
-}
-
-std::size_t GroceryItemDatabase::size() const
-{
-  // Return total number of grocery items in the database
-  return _data.size();
+  if( index >= _data.size() ) return nullptr;
+  if( _data[index].upcCode() == upc ) return &_data[index];
+  return find( upc, index + 1 );
 }
 /////////////////////// END-TO-DO (3) ////////////////////////////
